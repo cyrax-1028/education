@@ -1,0 +1,61 @@
+{% extends 'education/base/base.html' %}
+{% block home_content %}
+
+    <header class="bg-primary text-white text-center py-5">
+        <div class="container">
+            <h1>O'quv markazimizga xush kelibsiz!</h1>
+            <p class="lead">Sizni eng yaxshi o‘quv kurslarimizga taklif qilamiz</p>
+            <a href="#courses" class="btn btn-light btn-lg">Kurslarni ko‘rish</a>
+        </div>
+    </header>
+
+    <section id="about" class="py-5 text-center">
+        <div class="container">
+            <h2>Biz haqimizda</h2>
+            <p class="lead">Biz zamonaviy ta’lim dasturlarini taqdim etuvchi o‘quv markazimiz.</p>
+        </div>
+    </section>
+
+    <section id="courses" class="py-5 bg-light text-center">
+        <div class="container">
+            <h2>Kurslarimiz</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card p-3">
+                        <h4>Python Dasturlash</h4>
+                        <p>0 dan professional darajaga qadar Python o‘rganing.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card p-3">
+                        <h4>Web Dasturlash</h4>
+                        <p>HTML, CSS, JavaScript va Django orqali veb saytlar yaratishni o‘rganing.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card p-3">
+                        <h4>Sun’iy Intellekt</h4>
+                        <p>AI va Machine Learning asoslarini o‘rganing.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="py-5 text-center">
+        <div class="container">
+            <h2>Bog‘lanish</h2>
+            <p>Biz bilan bog‘lanish uchun quyidagi manzilga yozing.</p>
+            <a href="mailto:bahromjonsherqoziyev@gmail.com" class="btn btn-primary">Email Yuborish</a>
+        </div>
+    </section>
+
+    <footer class="bg-dark text-white text-center py-3">
+        <p>&copy; 2025 O'quv Markazi. Barcha huquqlar himoyalangan.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+{% endblock %}

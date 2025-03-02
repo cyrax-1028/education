@@ -1,0 +1,38 @@
+# Python cache fayllari
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual muhit (venv, env)
+venv/
+env/
+
+# Django migrations cache
+**/migrations/**
+!**/migrations/__init__.py  # Faqat boshlang‘ich fayl qolishi kerak
+
+# Mahalliy sozlamalar
+.env
+*.local
+
+# Media va static fayllar
+media/
+static/
+staticfiles/
+*.log
+
+# SQLite baza fayllari (agar ishlatilsa)
+#*.sqlite3
+#db.sqlite3
+
+# VSCode sozlamalari
+.vscode/
+
+# PyCharm sozlamalari
+.idea/
+
+# MacOS fayllari
+.DS_Store
+
+# __pycache__ ichidagi fayllar
+**/__pycache__/
