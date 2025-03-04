@@ -1,0 +1,24 @@
+{% extends 'teachers/base.html' %}
+
+{% block title %}Guruhlar Ro‘yxati{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">📚 Guruhlar Ro‘yxati</h2>
+
+    <div class="row">
+        {% for group in groups %}
+        <div class="col-md-6">
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">{{ group.name }}</h5>
+                    <a href="{% url 'teachers:lessons' group.id %}" class="btn btn-primary">Ko‘rish</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center">❌ Hozircha hech qanday guruh mavjud emas.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

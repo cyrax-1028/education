@@ -1,14 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User
-
-# class CustomUser(AbstractUser):
-#     is_teacher = models.BooleanField(default=False)
-#
-#     def __str__(self):
-#         return self.username
-
+from teachers.models import Teacher, Student
 
 class BaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -30,59 +23,60 @@ class Course(BaseModel):
     def __str__(self):
         return self.title
 
-# class Group(BaseModel):
-#     name = models.CharField(max_length=255)
-#     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-#     teacher = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, limit_choices_to={'is_teacher': True})
-#
-#     def __str__(self):
-#         return f"{self.name} ({self.course.title})"
+
+class Group(BaseModel):
+    name = models.CharField(max_length=255)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(Teacher, on_delete=models.SET_NULL, null=True, related_name='group_teacher')
+
+    def __str__(self):
+        return f"{self.name} ({self.course.title})"
 
 
-# class Student(BaseModel):
-#     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'is_student': True})
-#     group = models.ForeignKey(Group, on_delete=models.CASCADE)
-#
-#     def __str__(self):
-#         return self.user.username
+class Lesson(BaseModel):
+    title = models.CharField(max_length=255)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='lessons')
+    date = models.DateField()
+
+    def __str__(self):
+        return f"{self.title} ({self.group.name})"
 
 
-# class Lesson(BaseModel):
-#     title = models.CharField(max_length=255)
-#     group = models.ForeignKey(Group, on_delete=models.CASCADE)
-#     date = models.DateField()
-#
-#     def __str__(self):
-#         return f"{self.title} ({self.group.name})"
+class Attendance(BaseModel):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='attendances_student')
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='attendances_lesson')
+    is_present = models.BooleanField(default=False)
+    grade = models.IntegerField(default=0)
+
+    def save(self, *args, **kwargs):
+        if self.is_present:
+            self.grade = 4
+        else:
+            self.grade = 0
+        super(Attendance, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.student.full_name} - {self.lesson.title}: {'Bor' if self.is_present else 'Yo‘q'}"
 
 
-# class Attendance(BaseModel):
-#     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-#     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
-#     is_present = models.BooleanField(default=False)
+class Video(BaseModel):
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    video_file = models.FileField(upload_to="videos/")
 
-# def __str__(self):
-#     return f"{self.student.user.username} - {self.lesson.title}: {'Bor' if self.is_present else 'Yo‘q'}"
+    class Meta:
+        verbose_name = "Dars Videosi"
+        verbose_name_plural = "Dars Videolari"
+
+    def __str__(self):
+        return f"Video for {self.lesson.title}"
 
 
-# class Video(BaseModel):
-#     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
-#     video_file = models.FileField(upload_to="videos/")
-#
-#     class Meta:
-#         verbose_name = "Dars Videosi"
-#         verbose_name_plural = "Dars Videolari"
-#
-#     def __str__(self):
-#         return f"Video for {self.lesson.title}"
+class Students_of_group(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="students_of_group")
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="groups_of_students")
 
-# class Grade(models.Model):
-#     student = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="grades")
-#     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name="grades")
-#     score = models.PositiveIntegerField()
-#
-#     def __str__(self):
-#         return f"{self.student.username} - {self.lesson.title} - {self.score}"
+    def __str__(self):
+        return f"{self.student.full_name} - {self.group.name}"
 
 class EmailConfirmation(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

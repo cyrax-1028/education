@@ -1,0 +1,24 @@
+{% extends 'teachers/base.html' %}
+
+{% block title %}Darslar Ro‘yxati{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">{{ group.name }}</h2>
+        {% for lesson in lessons %}
+            <div class="row">
+                <div class="col-12">
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ lesson.title }} -- {{ lesson.created_at|date:"H:i  d/m/Y" }}</h5>
+                            <a href="{% url 'teachers:lesson_detail' lesson.id %}" class="btn btn-primary">Ko‘rish</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-center">❌ Hozircha hech qanday darslar mavjud emas.</p>
+        {% endfor %}
+    </div>
+
+{% endblock %}

@@ -1,23 +1,17 @@
 import uuid
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.urls import reverse
 from django.core.mail import send_mail
-from django.template.loader import render_to_string
 from django.conf import settings
-from django.contrib.sites.shortcuts import get_current_site
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
-from typing import Optional
 from .models import EmailConfirmation
+from teachers.models import Teacher, Student
+from phonenumber_field.phonenumber import PhoneNumber
 
 # Create your views here.
 
-@login_required(login_url='login')
 def index(request):
     return render(request, template_name='education/home.html')
 
@@ -26,24 +20,45 @@ def index(request):
 def register(request):
     if request.method == "POST":
         email = request.POST["email"]
+        first_name = request.POST["first_name"]
+        last_name = request.POST["last_name"]
         password1 = request.POST["password1"]
         password2 = request.POST["password2"]
+        role = request.POST.get("role")
 
         if password1 != password2:
             messages.error(request, "Parollar mos kelmadi!")
-            return redirect("register")
+            return redirect("education:register")
 
         if User.objects.filter(email=email).exists():
             messages.error(request, "Bu email allaqachon ro‘yxatdan o‘tgan!")
-            return redirect("register")
+            return redirect("education:register")
 
-        user = User.objects.create_user(username=email, email=email, password=password1, is_active=False)
+        user = User.objects.create_user(username=email, email=email,first_name=first_name, last_name=last_name, password=password1, is_active=False)
         user.save()
+
+        if role == "teacher":
+            phone_number = request.POST["teacher_phone"]
+            Teacher.objects.create(
+                user=user,
+                phone_number=PhoneNumber.from_string(phone_number, region="UZ"),
+                address=request.POST["teacher_address"],
+                job=request.POST["teacher_job"],
+                bio=""
+            )
+        elif role == "student":
+            phone_number = request.POST["student_phone"]
+            Student.objects.create(
+                full_name=request.POST["student_full_name"],
+                phone_number=PhoneNumber.from_string(phone_number, region="UZ"),
+                address=request.POST["student_address"],
+                bio=""
+            )
 
         token = str(uuid.uuid4())
         EmailConfirmation.objects.create(user=user, token=token)
 
-        confirmation_link = request.build_absolute_uri(reverse("confirm_email", args=[token]))
+        confirmation_link = request.build_absolute_uri(reverse("education:confirm_email", args=[token]))
 
         send_mail(
             "Email tasdiqlash",
@@ -58,7 +73,6 @@ def register(request):
 
     return render(request, "education/Authentication/register.html")
 
-
 def confirm_email(request, token):
     try:
         confirmation = EmailConfirmation.objects.get(token=token)
@@ -72,11 +86,11 @@ def confirm_email(request, token):
 
         login(request, user)
         messages.success(request, "Email tasdiqlandi! Xush kelibsiz!")
-        return redirect("product_list")
+        return redirect("education:index")
 
     except EmailConfirmation.DoesNotExist:
         messages.error(request, "Noto‘g‘ri yoki eskirgan tasdiqlash havolasi!")
-        return redirect("register")
+        return redirect("education:register")
 
 
 def user_login(request):
@@ -91,15 +105,15 @@ def user_login(request):
 
             send_mail(
                 "Kirish muvaffaqiyatli!",
-                f"Hurmatli {user.username}, siz Alibaba.com tizimiga muvaffaqiyatli kirdingiz!",
+                f"Hurmatli {user.email}, siz Alibaba.com tizimiga muvaffaqiyatli kirdingiz!",
                 settings.EMAIL_HOST_USER,
                 [user.email],
                 fail_silently=False,
             )
-            return redirect("product_list")
+            return redirect("education:index")
         else:
             messages.error(request, "Login yoki parol noto‘g‘ri!")
-            return redirect("login")
+            return redirect("education:login")
 
     return render(request, "education/Authentication/login.html")
 
@@ -114,4 +128,4 @@ def user_logout(request):
             fail_silently=False,
         )
     logout(request)
-    return redirect("product_list")
+    return redirect("education:index")

@@ -21,8 +21,8 @@ from config import settings
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
-                  path('', include('education.urls')),
-                  path('teachers/', include('teachers.urls')),
+                  path('', include('education.urls'), name='education'),
+                  path('teachers/', include('teachers.urls'), name='teachers'),
                   path('social-auth/',
                        include('social_django.urls', namespace='social')),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

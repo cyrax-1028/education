@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'education.apps.EducationConfig',
     'social_django',
     'teachers.apps.TeachersConfig',
+    'phonenumber_field',
 ]
 
 MIDDLEWARE = [
@@ -133,7 +134,7 @@ JAZZMIN_SETTINGS = {
     "site_title": "RapqonEdu Admin Panel",
     "site_header": "RaqponEdu Admin",
     "welcome_sign": "RapqonEdu markaziga xush kelibsiz!",
-    "login_logo": "static/images/logo.png",
+    # "login_logo": "static/images/logo.png",
     "show_sidebar": True,
     "navigation_expanded": True,
 }
@@ -153,4 +154,4 @@ AUTHENTICATION_BACKENDS = (
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("GOOGLE_OAUTH2_KEY")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("GOOGLE_OAUTH2_SECRET")
 
-LOGIN_REDIRECT_URL = 'index'
+LOGIN_REDIRECT_URL = 'education:index'

@@ -1,0 +1,88 @@
+{% extends 'teachers/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <h2>{{ lesson.lesson_group.name }}</h2>
+
+    <!-- Tab tugmalari -->
+    <ul class="nav nav-tabs">
+        <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#attendance">Yo‘qlama</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#videos">Videolar</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#homework">Uy vazifalari</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#exam">Imtihonlar</a></li>
+    </ul>
+
+    <!-- Tab tarkibi -->
+    <div class="tab-content mt-3">
+        <div class="tab-pane fade show active" id="attendance">
+            <h3 class="mb-3">Yo‘qlama</h3>
+            <form method="POST" action="{% url 'teachers:update_attendance' lesson.id %}">
+                {% csrf_token %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>O‘quvchi ismi</th>
+                            <th class="text-center">Kelgan</th>
+                            <th class="text-center">XP</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for student in students %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ student.student.full_name }}</td>
+                                <td class="text-center">
+                                    <input type="checkbox" name="attendance_{{ student.student.id }}"
+                                           {% if student.attendance.is_present %}checked{% endif %}>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-success">{{ student.attendance.grade }}</span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-3">Saqlash</button>
+            </form>
+        </div>
+
+        <div class="tab-pane fade" id="videos">
+            <h3>Videolar</h3>
+            <p>Bu yerda dars videolari yuklanadi.</p>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ form.video_file }}
+                </div>
+                <button type="submit" class="btn btn-primary">Yuklash</button>
+            </form>
+
+            <div class="mt-4">
+                {% for video in videos %}
+                    <div class="mb-3 text-center">
+                        <video style="width: 75%; max-height: 400px;" controls>
+                            <source src="{{ video.video_file.url }}" type="video/mp4">
+                            Brauzeringiz videoni qo‘llab-quvvatlamaydi.
+                        </video>
+                    </div>
+                {% empty %}
+                    <p>Hozircha hech qanday video yuklanmagan.</p>
+                {% endfor %}
+            </div>
+
+        </div>
+        <div class="tab-pane fade" id="homework">
+            <h3>Uy vazifalari</h3>
+            <p>O‘quvchilar uchun berilgan topshiriqlar.</p>
+        </div>
+        <div class="tab-pane fade" id="exam">
+            <h3>Imtihonlar</h3>
+            <p>Bu yerda imtihonlar bo‘lib o‘tadi.</p>
+        </div>
+    </div>
+{% endblock %}
