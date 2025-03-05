@@ -1,9 +1,9 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect, reverse
 from django.contrib.auth.decorators import login_required
 from education.forms import VideoUploadForm
-
 from education.models import Lesson, Group, Attendance, Video
 from teachers.models import Teacher
+from .forms import LessonForm
 
 
 @login_required(login_url='education:login')
@@ -95,3 +95,26 @@ def update_attendance(request, lesson_id):
                 attendance.save()
 
     return redirect("teachers:lesson_detail", pk=lesson_id)
+
+
+@login_required(login_url="education:login")
+def add_lesson(request, group_id):
+    group = get_object_or_404(Group, id=group_id)
+    teacher = get_object_or_404(Teacher, id=group.teacher.id)
+
+    if request.method == "POST":
+        form = LessonForm(request.POST)
+        if form.is_valid():
+            lesson = form.save(commit=False)
+            lesson.group = group
+            lesson.save()
+            return redirect(reverse("teachers:lessons", kwargs={"pk": group_id}))
+    else:
+        form = LessonForm()
+
+    context = {
+        'group': group,
+        'teacher': teacher,
+        'form': form,
+    }
+    return render(request, "teachers/add_lesson.html", context)

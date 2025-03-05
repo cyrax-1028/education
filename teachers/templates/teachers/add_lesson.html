@@ -1,0 +1,32 @@
+{% extends 'teachers/base.html' %}
+
+{% block title %}Dars Qo‘shish{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">{{ group.name }} - Yangi Dars Qo‘shish</h2>
+    
+    <div class="card shadow-sm p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="id_title" class="form-label">Dars nomi</label>
+                {{ form.title }}
+            </div>
+            <div class="mb-3">
+                <label for="id_date" class="form-label">Sana</label>
+                {{ form.date }}
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'teachers:lessons' group.id %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Ortga
+                </a>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i> Saqlash
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
