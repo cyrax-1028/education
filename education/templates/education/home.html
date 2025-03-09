@@ -86,10 +86,10 @@
         <h1 class="hero-title">RapqonEdu - Knowledge Center</h1>
         <p class="lead">Knowledge is the key to unlocking endless possibilities. Keep learning, keep growing</p>
         <a href="#" class="btn btn-custom">Start as Student</a>
-        {% if user.is_authenticated %}
+        {% if user.is_authenticated and user.teacher_profile.id %}
             <a href="{% url 'teachers:profile' user.teacher_profile.pk %}" class="btn btn-custom">Start as Teacher</a>
         {% else %}
-            <a href="{% url 'education:login' %}" class="btn btn-custom">Login</a>
+            <a href="{% url 'education:login' %}" class="btn btn-custom">Login as Teacher</a>
         {% endif %}
     </div>
     <div class="shape shape-1"></div>

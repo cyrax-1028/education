@@ -2,6 +2,7 @@ from django.db import models
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User
 from teachers.models import Teacher, Student
+from django.utils import timezone
 
 class BaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -55,9 +56,6 @@ class Attendance(BaseModel):
             self.grade = 0
         super(Attendance, self).save(*args, **kwargs)
 
-    def __str__(self):
-        return f"{self.student.full_name} - {self.lesson.title}: {'Bor' if self.is_present else 'Yo‘q'}"
-
 
 class Video(BaseModel):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
@@ -85,3 +83,9 @@ class EmailConfirmation(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - {self.token}"
+
+class Homework(BaseModel):
+    lesson = models.OneToOneField(Lesson, on_delete=models.CASCADE, related_name="homework")
+    description = models.TextField()
+    file = models.FileField(upload_to='homeworks/', blank=True, null=True)
+    deadline = models.DateTimeField()

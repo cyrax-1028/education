@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Course, Group, Lesson, Attendance, Video, EmailConfirmation, Students_of_group
+from .models import Course, Group, Lesson, Attendance, Video, EmailConfirmation, Students_of_group, Homework
 
 @admin.register(Course)
 class CategoryAdmin(admin.ModelAdmin):
@@ -38,6 +38,12 @@ class EmailConfirmationAdmin(admin.ModelAdmin):
 @admin.register(Students_of_group)
 class Students_of_groupAdmin(admin.ModelAdmin):
     list_display = ("student", "group")
+
+
+@admin.register(Homework)
+class HomeworkAdmin(admin.ModelAdmin):
+    list_display = ("lesson", "created_at")
+    search_fields = ("lesson__title",)
 
 
 admin.site.site_header = 'RapqonEdu Admin'

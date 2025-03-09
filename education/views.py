@@ -105,7 +105,7 @@ def user_login(request):
 
             send_mail(
                 "Kirish muvaffaqiyatli!",
-                f"Hurmatli {user.email}, siz Alibaba.com tizimiga muvaffaqiyatli kirdingiz!",
+                f"Hurmatli {user.email}, siz RapqonEdu tizimiga muvaffaqiyatli kirdingiz!",
                 settings.EMAIL_HOST_USER,
                 [user.email],
                 fail_silently=False,
@@ -122,7 +122,7 @@ def user_logout(request):
     if request.user.is_authenticated:
         send_mail(
             "Chiqish amalga oshirildi!",
-            f"Hurmatli {request.user.username}, siz Alibaba.com tizimidan chiqdingiz!",
+            f"Hurmatli {request.user.username}, siz RapqonEdu tizimidan chiqdingiz!",
             settings.EMAIL_HOST_USER,
             [request.user.email],
             fail_silently=False,

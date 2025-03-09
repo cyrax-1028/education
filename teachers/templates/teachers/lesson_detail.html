@@ -3,21 +3,22 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-    <h2>{{ lesson.lesson_group.name }}</h2>
+    <h2>{{ lesson.group.name }}</h2>
 
     <!-- Tab tugmalari -->
     <ul class="nav nav-tabs">
         <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#attendance">Yo‘qlama</a></li>
         <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#videos">Videolar</a></li>
         <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#homework">Uy vazifalari</a></li>
-        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#exam">Imtihonlar</a></li>
     </ul>
 
     <!-- Tab tarkibi -->
     <div class="tab-content mt-3">
         <div class="tab-pane fade show active" id="attendance">
             <h3 class="mb-3">Yo‘qlama</h3>
-            <form method="POST" action="{% url 'teachers:update_attendance' lesson.id %}">
+
+            <form id="attendanceForm" method="POST" action="{% url 'teachers:update_attendance' lesson.id %}"
+                  style="display: none;">
                 {% csrf_token %}
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover">
@@ -35,8 +36,10 @@
                                 <td>{{ forloop.counter }}</td>
                                 <td>{{ student.student.full_name }}</td>
                                 <td class="text-center">
-                                    <input type="checkbox" name="attendance_{{ student.student.id }}"
-                                           {% if student.attendance.is_present %}checked{% endif %}>
+                                    <input type="hidden" name="attendance_{{ student.student.id }}" value="off">
+                                    <input type="checkbox" name="attendance_{{ student.student.id }}" value="on"
+                                           {% if student.attendance.is_present %}checked{% endif %}
+                                           onclick="this.previousElementSibling.value = this.checked ? 'on' : 'off'">
                                 </td>
                                 <td class="text-center">
                                     <span class="badge bg-success">{{ student.attendance.grade }}</span>
@@ -49,11 +52,43 @@
 
                 <button type="submit" class="btn btn-primary mt-3">Saqlash</button>
             </form>
+
+            <table id="attendanceTable" class="table table-bordered table-hover">
+                <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>O‘quvchi ismi</th>
+                    <th class="text-center">Kelgan</th>
+                    <th class="text-center">XP</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for student in students %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ student.student.full_name }}</td>
+                        <td class="text-center">
+                            {% if student.attendance.is_present %}
+                                ✅
+                            {% else %}
+                                ❌
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-success">{{ student.attendance.grade }}</span>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <button id="editButton" class="btn btn-warning">Tahrirlash</button>
         </div>
 
         <div class="tab-pane fade" id="videos">
             <h3>Videolar</h3>
             <p>Bu yerda dars videolari yuklanadi.</p>
+
+            <!-- Video yuklash formasi -->
             <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="mb-3">
@@ -62,27 +97,77 @@
                 <button type="submit" class="btn btn-primary">Yuklash</button>
             </form>
 
+            <!-- Videolar jadvali -->
             <div class="mt-4">
-                {% for video in videos %}
-                    <div class="mb-3 text-center">
-                        <video style="width: 75%; max-height: 400px;" controls>
-                            <source src="{{ video.video_file.url }}" type="video/mp4">
-                            Brauzeringiz videoni qo‘llab-quvvatlamaydi.
-                        </video>
-                    </div>
-                {% empty %}
-                    <p>Hozircha hech qanday video yuklanmagan.</p>
-                {% endfor %}
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>Video nomi</th>
+                        <th>Harakatlar</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for video in videos %}
+                        <tr>
+                            <td>
+                                <a href="{{ video.video_file.url }}" target="_blank">
+                                    {{ video.video_file.name|cut:"videos/" }}
+                                </a>
+                            </td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ video.id }})">
+                                    <i class="fa fa-trash"></i> Delete
+                                </button>
+                                <form id="delete-form-{{ video.id }}" method="POST"
+                                      action="{% url 'teachers:delete_video' video.id %}" style="display: none;">
+                                    {% csrf_token %}
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="2" class="text-center">Hozircha hech qanday video yuklanmagan.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
+        </div>
 
-        </div>
+        <script>
+            function confirmDelete(videoId) {
+                if (confirm("Haqiqatan ham ushbu videoni o‘chirmoqchimisiz?")) {
+                    document.getElementById("delete-form-" + videoId).submit();
+                }
+            }
+        </script>
+
         <div class="tab-pane fade" id="homework">
-            <h3>Uy vazifalari</h3>
-            <p>O‘quvchilar uchun berilgan topshiriqlar.</p>
-        </div>
-        <div class="tab-pane fade" id="exam">
-            <h3>Imtihonlar</h3>
-            <p>Bu yerda imtihonlar bo‘lib o‘tadi.</p>
+            <h3>Uy vazifasi</h3>
+            {% if homework %}
+                <p>{{ homework.description }}</p>
+                <p>Deadline: {{ homework.deadline }}</p>
+                {% if homework.file %}
+                    <p><a href="{{ homework.file.url }}" download>Faylni yuklab olish</a></p>
+                {% endif %}
+                <button type="button" class="btn btn-primary mt-3"
+                        onclick="window.location.href='{% url 'teachers:edit_homework' lesson.id %}'">Tahrirlash
+                </button>
+            {% else %}
+                <p>Hali uyga vazifa yuklanmagan.</p>
+                <button type="button" class="btn btn-primary mt-3"
+                        onclick="window.location.href='{% url 'teachers:create_homework' lesson.id %}'">Yuklash
+                </button>
+            {% endif %}
         </div>
     </div>
+
+    <script>
+        document.getElementById("editButton").addEventListener("click", function () {
+            document.getElementById("attendanceTable").style.display = "none";
+            document.getElementById("attendanceForm").style.display = "block";
+            this.style.display = "none";
+        });
+    </script>
+
 {% endblock %}

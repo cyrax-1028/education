@@ -1,0 +1,28 @@
+{% extends 'teachers/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Uyga vazifa yaratish - {{ lesson.title }}</h2>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Saqlash</button>
+    </form>
+
+    <a href="{% url 'teachers:lesson_detail' lesson.id %}" class="btn btn-secondary mt-2">Orqaga</a>
+</div>
+
+<!-- Flatpickr kutubxonasini ulash -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        flatpickr("input[name='deadline']", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            time_24hr: true
+        });
+    });
+</script>
+{% endblock %}

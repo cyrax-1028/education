@@ -1,0 +1,45 @@
+{% extends 'teachers/base.html' %}
+
+{% block title %}Profilni Tahrirlash{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-lg p-4">
+        <h4 class="mb-3">Profilni Tahrirlash</h4>
+        <form method="POST">
+            {% csrf_token %}
+
+            <h5>Foydalanuvchi ma’lumotlari</h5>
+            <div class="mb-3">
+                <label for="first_name" class="form-label">Ism</label>
+                <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user_form.first_name.value }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="last_name" class="form-label">Familiya</label>
+                <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user_form.last_name.value }}" required>
+            </div>
+
+            <h5>O‘qituvchi ma’lumotlari</h5>
+            <div class="mb-3">
+                <label for="bio" class="form-label">Bio</label>
+                <textarea class="form-control" id="bio" name="bio" rows="3">{{ teacher_form.bio.value }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="phone_number" class="form-label">Telefon</label>
+                <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ teacher_form.phone_number.value }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="address" class="form-label">Manzil</label>
+                <input type="text" class="form-control" id="address" name="address" value="{{ teacher_form.address.value }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="job" class="form-label">Kasb</label>
+                <input type="text" class="form-control" id="job" name="job" value="{{ teacher_form.job.value }}" required>
+            </div>
+
+            <button type="submit" class="btn btn-success">Saqlash</button>
+            <a href="{% url 'teachers:profile' user.teacher_profile.id %}" class="btn btn-secondary">Bekor qilish</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
